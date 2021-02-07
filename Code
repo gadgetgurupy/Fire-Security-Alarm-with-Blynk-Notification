@@ -1,0 +1,44 @@
+#define BLYNK_PRINT Serial
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+BlynkTimer timer;
+char auth[] = "enter yourm blynk auth code"; //Auth code sent via Email
+char ssid[] = "enter your wifi name "; //Wifi name
+char pass[] = "enter your wifi password";  //Wifi Password
+int flag=0;
+void notifyOnFire()
+{
+  int isButtonPressed = digitalRead(D2);
+  if (isButtonPressed==0 && flag==0 ) {
+    Serial.println("Fire in the House");
+    Blynk.notify("Alert : Fire in the House");
+    flag=1;
+    digitalWrite(D0,LOW);
+    digitalWrite(D1,HIGH);
+    digitalWrite(D3,HIGH);
+    
+    
+  }
+  else if (isButtonPressed==1)
+  {
+    flag=0;
+    digitalWrite(D0,HIGH);
+    digitalWrite(D1,LOW);
+    digitalWrite(D3,LOW);
+  }
+}
+void setup()
+{
+Serial.begin(9600);
+Blynk.begin(auth, ssid, pass);
+pinMode(D2,INPUT_PULLUP);
+pinMode(D0,OUTPUT);
+pinMode(D1,OUTPUT);
+pinMode(D3,OUTPUT);
+timer.setInterval(1000L,notifyOnFire); 
+}
+void loop()
+{
+  Blynk.run();
+  timer.run();
+}
